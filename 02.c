@@ -1,8 +1,27 @@
 #include <stdio.h>
 #include <string.h>
 
-int main() {
-	freopen("input.txt", "r", stdin);
+void part1() {
+	char buf[10];
+	int x;
+	int depth = 0;
+	int horiz = 0;
+	while (scanf("%s ", buf) != EOF) {
+		scanf("%d", &x);
+		if (strcmp(buf, "up") == 0) {
+			depth -= x;
+		}
+		else if (strcmp(buf, "down") == 0) {
+			depth += x;
+		}
+		else { // forward
+			horiz += x;
+		}
+	}
+	printf("%d\n", depth * horiz);
+}
+
+void part2() {
 	char buf[10];
 	int x;
 	int depth = 0;
@@ -23,3 +42,9 @@ int main() {
 	}
 	printf("%d\n", depth * horiz);
 }
+
+int main() {
+	freopen("input.txt", "r", stdin); part1();
+	freopen("input.txt", "r", stdin); part2();
+}
+

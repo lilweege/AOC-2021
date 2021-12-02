@@ -1,8 +1,18 @@
 #include <stdio.h>
 
-int main() {
-	freopen("input.txt", "r", stdin);
-	
+int part1() {
+	int last = 1 << 30;
+	int curr;
+	int cnt = 0;
+	while (scanf("%d", &curr) != EOF) {
+		if (curr > last)
+			++cnt;
+		last = curr;
+	}
+	printf("%d\n", cnt);
+}
+
+int part2() {
 	int minus1, minus2, minus3;
 	scanf("%d", &minus3);
 	scanf("%d", &minus2);
@@ -24,5 +34,11 @@ int main() {
 		lastSum = currSum;
 	}
 	printf("%d\n", cnt);
+}
+
+
+int main() {
+	freopen("input.txt", "r", stdin); part1();
+	freopen("input.txt", "r", stdin); part2();
 }
 
