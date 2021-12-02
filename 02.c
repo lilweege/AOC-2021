@@ -2,6 +2,7 @@
 #include <string.h>
 
 void part1() {
+	freopen("input.txt", "r", stdin);
 	char buf[10];
 	int x;
 	int depth = 0;
@@ -22,6 +23,7 @@ void part1() {
 }
 
 void part2() {
+	freopen("input.txt", "r", stdin);
 	char buf[10];
 	int x;
 	int depth = 0;
@@ -44,7 +46,6 @@ void part2() {
 }
 
 int main() {
-	freopen("input.txt", "r", stdin); part1();
-	freopen("input.txt", "r", stdin); part2();
+	part1();
+	part2();
 }
-
