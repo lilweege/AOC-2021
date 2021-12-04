@@ -1,7 +1,9 @@
 #include <stdio.h>
 
-int part1() {
-	freopen("input.txt", "r", stdin);
+#define FILENAME "input.txt"
+
+void part1() {
+	freopen(FILENAME, "r", stdin);
 	int last = 1 << 30;
 	int curr;
 	int cnt = 0;
@@ -13,8 +15,8 @@ int part1() {
 	printf("%d\n", cnt);
 }
 
-int part2() {
-	freopen("input.txt", "r", stdin);
+void part2() {
+	freopen(FILENAME, "r", stdin);
 	int minus1, minus2, minus3;
 	scanf("%d", &minus3);
 	scanf("%d", &minus2);

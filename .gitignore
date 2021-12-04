@@ -1,3 +1,5 @@
+Makefile
+test.c
 sample.txt
 input.txt
 a.out

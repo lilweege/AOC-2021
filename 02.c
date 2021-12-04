@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#define FILENAME "input.txt"
+
 void part1() {
-	freopen("input.txt", "r", stdin);
+	freopen(FILENAME, "r", stdin);
 	char buf[10];
 	int x;
 	int depth = 0;
@@ -23,7 +25,7 @@ void part1() {
 }
 
 void part2() {
-	freopen("input.txt", "r", stdin);
+	freopen(FILENAME, "r", stdin);
 	char buf[10];
 	int x;
 	int depth = 0;

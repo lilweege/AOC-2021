@@ -2,35 +2,37 @@
 #include <stdbool.h>
 #include <assert.h>
 
-const int numBits = 12;
-const int maxValues = 1000;
+#define FILENAME "input.txt"
+
+#define NUM_BITS 12
+#define MAX_VALUES 1000
 
 void part1() {
-    freopen("input.txt", "r", stdin);
-    char buf[numBits+1];
+    freopen(FILENAME, "r", stdin);
+    char buf[NUM_BITS+1];
 
-    int bitCount[numBits];
-    for (int i = 0; i < numBits; ++i)
+    int bitCount[NUM_BITS];
+    for (int i = 0; i < NUM_BITS; ++i)
         bitCount[i] = 0;
     int numValues = 0;
     while (scanf("%s", buf) != EOF) {
         ++numValues;
-        for (int i = 0; i < numBits; ++i)
+        for (int i = 0; i < NUM_BITS; ++i)
             if (buf[i] == '1')
                 ++bitCount[i];
     }
 
     int gamma = 0;
-    for (int i = 0; i < numBits; ++i)
+    for (int i = 0; i < NUM_BITS; ++i)
         if (bitCount[i] > numValues / 2)
-            gamma += 1 << (numBits-i-1);
-    int epsilon = ~(gamma - (1 << numBits));
+            gamma += 1 << (NUM_BITS-i-1);
+    int epsilon = ~(gamma - (1 << NUM_BITS));
     printf("%d\n", gamma * epsilon);
 }
 
 void part2() {
-    freopen("input.txt", "r", stdin);
-    char values[maxValues+1][numBits+1];
+    freopen(FILENAME, "r", stdin);
+    char values[MAX_VALUES+1][NUM_BITS+1];
     int numValues = 0;
     while (scanf("%s", values[numValues]) != EOF)
         ++numValues;
@@ -40,7 +42,7 @@ void part2() {
     int numOxy = numValues;
     int numCO2 = numValues;
 
-    for (int i = 0; i < numBits; ++i) {
+    for (int i = 0; i < NUM_BITS; ++i) {
         int OxyBitCount = 0;
         int CO2BitCount = 0;
         for (int j = 0; j < numValues; ++j) {
@@ -73,11 +75,11 @@ void part2() {
         if (CO2Ok[i]) CO2Idx = i;
     }
     int OxyRating = 0, CO2Rating = 0;
-    for (int i = 0; i < numBits; ++i) {
+    for (int i = 0; i < NUM_BITS; ++i) {
         if (values[OxyIdx][i] == '1')
-            OxyRating += 1 << (numBits-i-1);
+            OxyRating += 1 << (NUM_BITS-i-1);
         if (values[CO2Idx][i] == '1')
-            CO2Rating += 1 << (numBits-i-1);
+            CO2Rating += 1 << (NUM_BITS-i-1);
     }
     printf("%d\n", OxyRating * CO2Rating);
 }
