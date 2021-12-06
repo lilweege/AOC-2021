@@ -20,7 +20,7 @@ void solve(int numDays) {
     for (int day = 0; day < numDays; ++day) {
         numFish[day % 7] += diff[day % 7];
         totalFish += numFish[day % 7];
-        if (day > 2) {
+        if (day > 1) {
             int x = (day - 2) % 7;
             diff[day % 7] = numFish[x];
         }
