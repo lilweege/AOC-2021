@@ -6,7 +6,7 @@
 #define FILENAME "input.txt"
 
 // this is probably the most tedious problem to solve in c
-// adjacency list of strings plus queue from scratch 😻
+// adjacency list of strings 😻
 #define MAX_LINES 32
 #define MAX_STRLEN 8
 
@@ -30,12 +30,6 @@ int hash(char* s) {
     return val % TABLE_SIZE;
 }
 
-typedef struct {
-    int pos;
-    int visCnt[TABLE_SIZE];
-    bool twoSmall;
-} path;
-
 bool isLower(char* s) {
     for (char c; c = *s++;)
         if (!('a' <= c && c <= 'z'))
@@ -43,10 +37,7 @@ bool isLower(char* s) {
     return true;
 }
 
-// this would probably be easier to implement recursively
-// but I already started this so I'm not changing it
-#define Q_SZ (1 << 17)
-path q[Q_SZ];
+int visCnt[TABLE_SIZE];
 char strs[TABLE_SIZE][MAX_STRLEN];
 int hshs[TABLE_SIZE];
 bool lower[TABLE_SIZE];
@@ -92,51 +83,44 @@ void readInput() {
     assert(end != -1);
 }
 
-void solve(bool part1) {
-    int ans = 0;
-    q[0].pos = start;
-    q[0].twoSmall = 0;
-    q[0].visCnt[start] = true;
-    int front = 0, back = 1;
-    while (back != front) {
-        path cur = q[front];
-        front = (front + 1) % Q_SZ;
-        if (cur.pos == end) {
-            ++ans;
-            continue;
+void dfs(bool curTwoSmall, int cur, int* cnt, bool part1) {
+    if (cur == end) {
+        ++*cnt;
+        return;
+    }
+    for (int i = 0; i < adj[cur].sz; ++i) {
+        int nxt = adj[cur].lst[i];
+        bool twoSmall = curTwoSmall;
+        if (part1) {
+            if (lower[nxt] && visCnt[nxt]) {
+                continue;
+            }
         }
-        for (int i = 0; i < adj[cur.pos].sz; ++i) {
-            int nxt = adj[cur.pos].lst[i];
-            // assert(nxt != 0);
-            bool twoSmall = cur.twoSmall;
+        else {
             if (nxt == start) {
                 continue;
             }
-            if (part1) {
-                if (lower[nxt] && cur.visCnt[nxt]) {
-                    continue;
-                }
-            }
-            else {
-                if (lower[nxt] && nxt != end) {
-                    if (cur.visCnt[nxt] == 1) {
-                        if (twoSmall)
-                            continue;
-                        twoSmall = true;
-                    }
-                    else if (cur.visCnt[nxt] >= 2)
+            if (lower[nxt] && nxt != end) {
+                if (visCnt[nxt] == 1) {
+                    if (twoSmall)
                         continue;
+                    twoSmall = true;
                 }
+                else if (visCnt[nxt] >= 2)
+                    continue;
             }
-            // sheeesh
-            memcpy(&q[back].visCnt, &cur.visCnt, TABLE_SIZE*sizeof(int));
-            q[back].pos = nxt;
-            q[back].visCnt[nxt]++;
-            q[back].twoSmall = twoSmall;
-            back = (back + 1) % Q_SZ;
         }
+        ++visCnt[nxt];
+        dfs(twoSmall, nxt, cnt, part1);
+        --visCnt[nxt];
     }
+}
 
+void solve(bool part1) {
+    memset(visCnt, 0, sizeof(visCnt));
+    visCnt[start] = 1;
+    int ans = 0;
+    dfs(false, start, &ans, part1);
     printf("%d\n", ans);
 }
 
