@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#define FILENAME "input.txt"
+
+#define FILENAME "input/14.txt"
 
 typedef unsigned long long ull;
 

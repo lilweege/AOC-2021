@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/07.txt"
 #define MAXN 1000
 
 int cmpInt(const void *a, const void *b) {

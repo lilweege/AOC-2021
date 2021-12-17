@@ -3,7 +3,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/11.txt"
 #define N 10
 #define ITERS 100
 

@@ -1,6 +1,4 @@
 Makefile
-test.c
-test.py
-sample.txt
-input.txt
-a.out
+input
+bin
+log

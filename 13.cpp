@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/13.txt"
 
 #include <unordered_set>
 // I highkey don't feel like writing a hashset from scratch today

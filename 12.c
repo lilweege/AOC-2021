@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/12.txt"
 
 // this is probably the most tedious problem to solve in c
 // adjacency list of strings 😻

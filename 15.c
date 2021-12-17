@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <string.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/15.txt"
 
 typedef struct {
     int a, b, c;

@@ -2,7 +2,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/06.txt"
 typedef long long ll;
 
 void solve(int numDays) {

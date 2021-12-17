@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/09.txt"
 #define MAXN 1000
 
 void top3(int x, int* x1, int* x2, int* x3) {

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/10.txt"
 #define MAX 128
 typedef long long ll;
 

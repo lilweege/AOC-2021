@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/04.txt"
 
 #define MAX_BOARDS 100
 #define BOARD_W 5

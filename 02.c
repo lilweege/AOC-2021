@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/02.txt"
 
 void part1() {
 	freopen(FILENAME, "r", stdin);

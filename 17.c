@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/17.txt"
 #define MAX_IT 500
 
 int x0, x1, y0, y1;

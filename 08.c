@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/08.txt"
 
 /*
   0:      1:      2:      3:      4:

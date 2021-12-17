@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/16.txt"
 typedef unsigned long long ull;
 
 #define ARR_CAP 64

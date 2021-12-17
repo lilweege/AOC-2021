@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/03.txt"
 
 #define NUM_BITS 12
 #define MAX_VALUES 1000

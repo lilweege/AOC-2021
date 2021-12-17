@@ -2,7 +2,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define FILENAME "input.txt"
+#define FILENAME "input/05.txt"
 #define GRID_SZ 1000
 
 int grid[GRID_SZ][GRID_SZ];
