@@ -2,7 +2,6 @@
 
 #define FILENAME "input.txt"
 #define MAX_IT 500
-#define MAX_DY 200
 
 int x0, x1, y0, y1;
 int simulate(int dx, int dy) {
@@ -26,14 +25,14 @@ void solve() {
     freopen(FILENAME, "r", stdin);
     scanf("target area: x=%d..%d, y=%d..%d",
         &x0, &x1, &y0, &y1);
-    int ans1 = 0, ans2 = 0;
-    // not sure if there's a mathematical way to solve this
+    int ans1 = y0*(y0+1)/2; // wow I love math
+    int ans2 = 0;
     for (int dx = 0; dx <= x1; ++dx)
-        for (int dy = y0; dy <= MAX_DY; ++dy) {
+        for (int dy = y0; dy < -y0; ++dy) {
             int by = simulate(dx, dy);
             if (by != -1) {
-                if (ans1 < by)
-                    ans1 = by;
+                // if (ans1 < by)
+                //     ans1 = by;
                 ++ans2;
             }
         }
