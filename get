@@ -1,0 +1,43 @@
+#!/bin/sh
+
+usage() {
+    echo "Usage: $0 <num> [all]"
+    exit 1
+}
+
+getDay() {
+    [ $# -ne 2 ] && return 1
+    day=$1
+    cookie=$2
+    curl --cookie "session=$cookie" "https://adventofcode.com/2021/day/$day/input" > input/$(printf "%02d\n" $day).txt
+}
+
+getCookie() {
+    cookie=$(cat .cookie 2> /dev/null)
+    if [ -z $cookie ]; then
+        echo "Enter cookie:"
+        stty -echo
+        read cookie
+        stty echo
+    fi
+    echo $cookie
+}
+
+day=$1
+[ -z "$day" ] && usage
+
+all=$2
+if [ -z "$all" ]; then
+    cookie=$(getCookie)
+    getDay $day $cookie
+else
+    [ "$all" != "all" ] && usage
+    cookie=$(getCookie)
+    
+    for x in $(seq 1 $day); do
+        getDay $x $cookie
+        # don't get throttled by server
+        # this may not be necessary
+        sleep 0.2
+    done
+fi

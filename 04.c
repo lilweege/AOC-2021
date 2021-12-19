@@ -18,7 +18,6 @@ void part1() {
     int numBoards = 0;
     int boards[MAX_BOARDS][BOARD_H][BOARD_W];
     for (char c; (c = getchar()) != EOF;) {
-        ungetc(c, stdin); // lol
         for (int i = 0; i < BOARD_H; ++i) {
             for (int j = 0; j < BOARD_W; ++j) {
                 scanf("%d", &boards[numBoards][i][j]);
@@ -26,6 +25,7 @@ void part1() {
         }
         ++numBoards;
     }
+    --numBoards;
 
     int winner = -1;
     int curr;
@@ -87,7 +87,6 @@ void part2() {
     int numBoards = 0;
     int boards[MAX_BOARDS][BOARD_H][BOARD_W];
     for (char c; (c = getchar()) != EOF;) {
-        ungetc(c, stdin); // lol
         for (int i = 0; i < BOARD_H; ++i) {
             for (int j = 0; j < BOARD_W; ++j) {
                 scanf("%d", &boards[numBoards][i][j]);
@@ -95,6 +94,7 @@ void part2() {
         }
         ++numBoards;
     }
+    --numBoards;
 
     int winners = 0;
     bool won[numBoards];
