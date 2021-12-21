@@ -178,12 +178,6 @@ void part2() {
     printf("%d\n", ans);
 }
 
-// 4140
-// 3993
-
-//3216
-//4643
-
 int main() {
     readInput();
     part1();
