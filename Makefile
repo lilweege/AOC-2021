@@ -1,23 +1,24 @@
 
 BIN = bin
 SRCS = $(wildcard *.c) $(wildcard *.cpp)
-BINS = $(patsubst %.c, $(BIN)/%.out, $(SRCS)) $(patsubst %.cpp, $(BIN)/%.out, $(SRCS))
+BINS = $(patsubst %.c, $(BIN)/%.out, $(wildcard *.c)) $(patsubst %.cpp, $(BIN)/%.out, $(wildcard *.cpp))
 LOGFILE = log
+CFLAGS = -Ofast
 
 all: $(BINS)
 
 $(BIN)/%.out: %.c
-	gcc -Ofast $< -o $@
+	gcc $(CFLAGS) $< -o $@ 2>/dev/null
 
 $(BIN)/%.out: %.cpp
-	g++ -Ofast $< -o $@
+	g++ $(CFLAGS) $< -o $@ 2>/dev/null
 
-run:
+run: $(BINS)
 	@rm -f $(LOGFILE)
 	@bash -c "TIMEFORMAT='%U'; \
 		duration=0; \
-		for f in \$$(ls bin); do \
-			elapsed=\$$(time (./bin/\$$f >> $(LOGFILE);) 2>&1); \
+		for f in \$$(ls $(BIN)); do \
+			elapsed=\$$(time (./$(BIN)/\$$f >> $(LOGFILE);) 2>&1); \
 			echo \$$(basename \$$f): \$$elapsed\ | tee -a $(LOGFILE); \
 			duration=\$$(echo \"\$$duration + \$$elapsed\" | bc); \
 		done; \
