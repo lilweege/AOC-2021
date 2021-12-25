@@ -2,8 +2,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define FILENAME "input/25.txt"
-
 #define MAXN 256
 char grid[MAXN][MAXN];
 int N, M;
@@ -13,7 +11,6 @@ typedef struct {
 } pair;
 
 void solve() {
-    freopen(FILENAME, "r", stdin);
     N = 0;
     while (scanf("%s", grid[N]) != EOF) {
         ++N;

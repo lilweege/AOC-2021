@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define FILENAME "input/24.txt"
-
 /*
 input matches the following pattern, once for each digit
 the z register is basically a stack in base 26
@@ -35,7 +33,6 @@ each push operation will have a corresponding pop pair in which val2 push is val
 #define LEN 14
 
 void solve() {
-    freopen(FILENAME, "r", stdin);
     char ans1[LEN+1], ans2[LEN+1];
     memset(ans1, '9', LEN); ans1[LEN] = 0;
     memset(ans2, '1', LEN); ans2[LEN] = 0;

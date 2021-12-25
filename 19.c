@@ -4,8 +4,6 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#define FILENAME "input/19.txt"
-
 typedef struct {
     int x, y, z;
 } point;
@@ -183,7 +181,6 @@ point dirs[6] = {
 };
 
 void solve() {
-    freopen(FILENAME, "r", stdin);
     scanner scanners[32];
     memset(scanners, 0, sizeof(scanners));
     int numScanners = -1;

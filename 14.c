@@ -1,14 +1,22 @@
 #include <stdio.h>
 #include <string.h>
 
-#define FILENAME "input/14.txt"
-
 typedef unsigned long long ull;
 
-void solve(int numIters) {
-    freopen(FILENAME, "r", stdin);
+ull getMaxDiff(ull charCnt[26]) {
+    ull ma = 0, mi = 1LL<<62;
+    for (int i = 0; i < 26; ++i) {
+        ull cnt = charCnt[i];
+        if (cnt == 0) continue;
+        if (cnt > ma) ma = cnt;
+        if (cnt < mi) mi = cnt;
+    }
+    return ma - mi;
+}
+
+void solve(int numIters1, int numIters2) {
     // thankfully the alphabet is small
-    char rules[26][26];
+    unsigned char rules[26][26];
     ull pairCnt[26][26], nextPairCnt[26][26];
     ull charCnt[26];
     memset(rules, -1, 26*26);
@@ -30,12 +38,15 @@ void solve(int numIters) {
         rules[a-'A'][b-'A'] = c-'A';
     }
 
-    for (int iter = 0; iter < numIters; ++iter) {
+    for (int iter = 0; iter < numIters2; ++iter) {
+        if (iter == numIters1) {
+            printf("%llu\n", getMaxDiff(charCnt));
+        }
         memcpy(nextPairCnt, pairCnt, 26*26*sizeof(ull));
         for (int a = 0; a < 26; ++a)
             for (int b = 0; b < 26; ++b) {
-                char c = rules[a][b];
-                if (c == -1) continue;
+                unsigned char c = rules[a][b];
+                if ((char)c == -1) continue;
                 charCnt[c] += pairCnt[a][b];
                 ull cnt = pairCnt[a][b];
                 nextPairCnt[a][c] += cnt;
@@ -45,17 +56,9 @@ void solve(int numIters) {
         memcpy(pairCnt, nextPairCnt, 26*26*sizeof(ull));
     }
 
-    ull ma = 0, mi = 1LL<<62;
-    for (int i = 0; i < 26; ++i) {
-        ull cnt = charCnt[i];
-        if (cnt == 0) continue;
-        if (cnt > ma) ma = cnt;
-        if (cnt < mi) mi = cnt;
-    }
-    printf("%llu\n", ma - mi);
+    printf("%llu\n", getMaxDiff(charCnt));
 }
 
 int main() {
-    solve(10);
-    solve(40);
+    solve(10, 40);
 }

@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-#define FILENAME "input/17.txt"
 #define MAX_IT 500
 
 int x0, x1, y0, y1;
@@ -22,7 +21,6 @@ int simulate(int dx, int dy) {
 }
 
 void solve() {
-    freopen(FILENAME, "r", stdin);
     scanf("target area: x=%d..%d, y=%d..%d",
         &x0, &x1, &y0, &y1);
     int ans1 = y0*(y0+1)/2; // wow I love math

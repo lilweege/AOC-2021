@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#define FILENAME "input/21.txt"
-
 int p1start, p2start;
 void readInput() {
-    freopen(FILENAME, "r", stdin);
     scanf("Player 1 starting position: %d\n", &p1start);
     scanf("Player 2 starting position: %d\n", &p2start);
 }

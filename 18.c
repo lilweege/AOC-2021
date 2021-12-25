@@ -3,8 +3,6 @@
 #include <stdbool.h>
 // #include <stdlib.h>
 
-#define FILENAME "input/18.txt"
-
 typedef struct node node;
 struct node {
     int val;
@@ -149,7 +147,6 @@ node* addNode(node* l, node* r) {
 node* nodes[128];
 int numNodes = 0;
 void readInput() {
-    freopen(FILENAME, "r", stdin);
     char line[64];
     while (scanf("%s", line) != EOF) {
         char* p = line;

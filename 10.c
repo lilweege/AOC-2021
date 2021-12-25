@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define FILENAME "input/10.txt"
 #define MAX 128
 typedef long long ll;
 
@@ -13,7 +12,6 @@ int cmpLL(const void *a, const void *b) {
 }
 
 void solve() {
-    freopen(FILENAME, "r", stdin);
     char lines[MAX][MAX];
     int sz = 0;
     while (scanf("%s", lines[sz]) != EOF) {
@@ -38,10 +36,10 @@ void solve() {
                     break;
                 }
                 char last = paren_stack[--top];
-                if (last == '(' && curr != ')' ||
-                    last == '[' && curr != ']' ||
-                    last == '{' && curr != '}' ||
-                    last == '<' && curr != '>'
+                if ((last == '(' && curr != ')') ||
+                    (last == '[' && curr != ']') ||
+                    (last == '{' && curr != '}') ||
+                    (last == '<' && curr != '>')
                 ) {
                     if (curr == ')')
                         syntaxScore += 3;

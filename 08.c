@@ -3,8 +3,6 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#define FILENAME "input/08.txt"
-
 /*
   0:      1:      2:      3:      4:
  aaaa    ....    aaaa    aaaa    ....
@@ -44,9 +42,7 @@ char* orig[10] = {
 };
 int origSizes[10] = { 6, 2, 5, 5, 4, 5, 6, 3, 7, 6 };
 
-
-void readInput() {
-    freopen(FILENAME, "r", stdin);
+void solve() {
     while (scanf("%s", lines[numLines][0]) != EOF) {
         sizes[numLines][0] = strlen(lines[numLines][0]);
         for (int i = 1; i < 14; ++i) {
@@ -56,23 +52,8 @@ void readInput() {
         }
         ++numLines;
     }
-}
 
-void part1() {
-    int ans = 0;
-    for (int l = 0; l < numLines; ++l) {
-        for (int i = 10; i < 14; ++i) {
-            int n = sizes[l][i];
-            if (n == 2 || n == 3 || n == 4 || n == 7) {
-                ++ans;
-            }
-        }
-    }
-    printf("%d\n", ans);
-}
-
-void part2() {
-    int ans = 0;
+    int ans1 = 0, ans2 = 0;
     for (int l = 0; l < numLines; ++l) {
         // len: 2 3 4 5 5 5 6 6 6 7
         // num: 1 7 4 x x x y y y 8
@@ -201,17 +182,20 @@ done3:;
         assert(0);
 done4:;
 
-
         int val = 0;
         for (int i = 10; i < 14; ++i) {
+            int n = sizes[l][i];
+            if (n == 2 || n == 3 || n == 4 || n == 7) {
+                ++ans1;
+            }
             bool has[7];
             memset(has, 0, 7);
-            for (int j = 0; j < sizes[l][i]; ++j) {
+            for (int j = 0; j < n; ++j) {
                 has[key[lines[l][i][j]-'a']] = true;
             }
             int origIdx = -1;
             for (int j = 0; j < 10; ++j) {
-                if (sizes[l][i] != origSizes[j]) {
+                if (n != origSizes[j]) {
                     continue;
                 }
                 bool yes = true;
@@ -229,13 +213,11 @@ done4:;
             assert(origIdx != -1);
             val = val * 10 + origIdx;
         }
-        ans += val;
+        ans2 += val;
     }
-    printf("%d\n", ans);
+    printf("%d\n%d\n", ans1, ans2);
 }
 
 int main() {
-    readInput();
-    part1();
-    part2();
+    solve();
 }

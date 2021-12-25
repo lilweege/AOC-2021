@@ -2,7 +2,6 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#define FILENAME "input/16.txt"
 typedef unsigned long long ull;
 
 #define ARR_CAP 64
@@ -115,7 +114,6 @@ ull parsePacket(int* idx) {
 }
 
 void solve() {
-    freopen(FILENAME, "r", stdin);
     char packet[MAX_STRLEN];
     scanf("%s%n", packet, &seqSize);
     

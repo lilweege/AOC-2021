@@ -1,41 +1,30 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <assert.h>
-
-#define FILENAME "input/03.txt"
+#include <string.h>
 
 #define NUM_BITS 12
 #define MAX_VALUES 1000
 
-void part1() {
-    freopen(FILENAME, "r", stdin);
-    char buf[NUM_BITS+1];
-
-    int bitCount[NUM_BITS];
-    for (int i = 0; i < NUM_BITS; ++i)
-        bitCount[i] = 0;
+void solve() {
+    char values[MAX_VALUES+1][NUM_BITS+1];
     int numValues = 0;
-    while (scanf("%s", buf) != EOF) {
-        ++numValues;
-        for (int i = 0; i < NUM_BITS; ++i)
-            if (buf[i] == '1')
-                ++bitCount[i];
-    }
+    int bitCount[NUM_BITS];
+    memset(bitCount, 0, NUM_BITS*sizeof(int));
 
+    while (scanf("%s", values[numValues]) != EOF) {
+        for (int i = 0; i < NUM_BITS; ++i)
+            if (values[numValues][i] == '1')
+                ++bitCount[i];
+        ++numValues;
+    }
     int gamma = 0;
     for (int i = 0; i < NUM_BITS; ++i)
         if (bitCount[i] > numValues / 2)
             gamma += 1 << (NUM_BITS-i-1);
     int epsilon = ~(gamma - (1 << NUM_BITS));
     printf("%d\n", gamma * epsilon);
-}
 
-void part2() {
-    freopen(FILENAME, "r", stdin);
-    char values[MAX_VALUES+1][NUM_BITS+1];
-    int numValues = 0;
-    while (scanf("%s", values[numValues]) != EOF)
-        ++numValues;
     bool OxyOk[numValues], CO2Ok[numValues];
     for (int i = 0; i < numValues; ++i)
         OxyOk[i] = CO2Ok[i] = 1;
@@ -85,6 +74,5 @@ void part2() {
 }
 
 int main() {
-	part1();
-	part2();
+	solve();
 }

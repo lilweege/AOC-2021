@@ -2,8 +2,6 @@
 #include <assert.h>
 #include <string.h>
 
-#define FILENAME "input/15.txt"
-
 typedef struct {
     int a, b, c;
 } tuple;
@@ -58,23 +56,27 @@ tuple heappop(arr* heap) {
 
 int b1Mod(int x, int m) { return (x - 1) % m + 1; }
 
+
 #define MAXN 100
 int di[4] = { 1, 0, -1, 0 };
 int dj[4] = { 0, 1, 0, -1 };
-void solve(int N) {
-    freopen(FILENAME, "r", stdin);
 
+int rows, cols;
+int grid[MAXN][MAXN];
+void readInput() {
     char input[MAXN][MAXN+1];
-    int rows = 0;
-    while (scanf("%s", &input[rows]) != EOF) {
+    rows = 0;
+    while (scanf("%s", (char*) &input[rows]) != EOF) {
         ++rows;
     }
-    int cols = strlen(input[0]);
-
-    int grid[rows][cols], dist[rows*N][cols*N];
+    cols = strlen(input[0]);
     for (int i = 0; i < rows; ++i)
         for (int j = 0; j < cols; ++j)
             grid[i][j] = input[i][j] - '0';
+}
+
+void solve(int N) {
+    int dist[rows*N][cols*N];
     memset(dist, 0x3f, rows*cols*N*N*sizeof(int));
     
     arr pq;
@@ -107,6 +109,7 @@ void solve(int N) {
 }
 
 int main() {
+    readInput();
     solve(1);
     solve(5);
 }

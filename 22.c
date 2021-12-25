@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define FILENAME "input/22.txt"
 #define SOLVE_SLOW 0
 
 typedef long long ll;
@@ -42,7 +41,6 @@ prism prisms[MAXP*2];
 // this is essentially a glorified brute force solution
 // in hindsight, I'm surpsised it's as fast as it is
 void solve() {
-    freopen(FILENAME, "r", stdin);
     int numPrisms = 0;
     for (char on[4]; scanf("%[^ ] ", on) != EOF;) {
         prism* p = &prisms[numPrisms];
@@ -139,7 +137,6 @@ void addPrismDiffs(prism* prisms, int* numPrisms, prism p1, prism p2) {
 
 prism buf[2][MAXP];
 void solve() {
-    freopen(FILENAME, "r", stdin);
     prism* prisms = buf[0];
     prism* newPrisms = buf[1];
     int numPrisms = 0, numNewPrisms = 0;
@@ -160,8 +157,8 @@ void solve() {
         numNewPrisms = 0;
     }
 
-    int ans1;
-    long long ans2;
+    int ans1 = 0;
+    long long ans2 = 0;
     for (int i = 0; i < numPrisms; ++i) {
         prism p = prisms[i];
         long long v = volume(prisms[i]);

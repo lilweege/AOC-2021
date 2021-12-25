@@ -2,10 +2,9 @@
 #include <string.h>
 #include <assert.h>
 
-#define FILENAME "input/06.txt"
 typedef long long ll;
 
-void solve(int numDays) {
+void solve(int numDays1, int numDays2) {
     ll totalFish = 0;
     ll numFish[7], diff[7];
     memset(numFish, 0, 7 * sizeof(ll));
@@ -17,7 +16,10 @@ void solve(int numDays) {
     for (int i = 0; i < 7; ++i) {
         totalFish += numFish[i];
     }
-    for (int day = 0; day < numDays; ++day) {
+    for (int day = 0; day < numDays2; ++day) {
+        if (day == numDays1) {
+            printf("%lld\n", totalFish);
+        }
         numFish[day % 7] += diff[day % 7];
         totalFish += numFish[day % 7];
         if (day > 1) {
@@ -30,17 +32,6 @@ void solve(int numDays) {
 }
 
 
-void part1() {
-    freopen(FILENAME, "r", stdin);
-    solve(80);
-}
-
-void part2() {
-    freopen(FILENAME, "r", stdin);
-    solve(256);
-}
-
 int main() {
-    part1();
-    part2();
+    solve(80, 256);
 }

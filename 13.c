@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define FILENAME "input/13.txt"
-
 typedef struct {
     int x, y;
 } point;
@@ -94,7 +92,6 @@ typedef struct {
 
 
 void solve() {
-    freopen(FILENAME, "r", stdin);
     hashset hs;
     hashsetClear(&hs);
 
@@ -111,7 +108,7 @@ void solve() {
         hashsetInsert(&hs, p);
     }
     do {
-        char axis; int pos;
+        char axis;
         sscanf(line, "fold along %c=%d",
             &axis, &folds[numFolds].pos);
         folds[numFolds++].axis = axis == 'x';

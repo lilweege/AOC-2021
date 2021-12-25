@@ -1,31 +1,15 @@
 #include <stdio.h>
 
-#define FILENAME "input/01.txt"
-
-void part1() {
-	freopen(FILENAME, "r", stdin);
-	int last = 1 << 30;
-	int curr;
-	int cnt = 0;
-	while (scanf("%d", &curr) != EOF) {
-		if (curr > last)
-			++cnt;
-		last = curr;
-	}
-	printf("%d\n", cnt);
-}
-
-void part2() {
-	freopen(FILENAME, "r", stdin);
+void solve() {
+	int cnt1 = 0, cnt2 = 0;
 	int minus1, minus2, minus3;
 	scanf("%d", &minus3);
-	scanf("%d", &minus2);
-	scanf("%d", &minus1);
+	scanf("%d", &minus2); if (minus2 > minus3) ++cnt1;
+	scanf("%d", &minus1); if (minus1 > minus2) ++cnt1;
 
 	int currSum = minus1 + minus2 + minus3;
 	int lastSum = currSum;
-	
-	int cnt = 0;
+	int lastDep = minus1;
 	int currDep = 0;
 	while (scanf("%d", &currDep) != EOF) {
 		currSum -= minus3;
@@ -33,15 +17,17 @@ void part2() {
 		minus3 = minus2;
 		minus2 = minus1;
 		minus1 = currDep;
+		if (currDep > lastDep)
+			++cnt1;
 		if (currSum > lastSum)
-			++cnt;
+			++cnt2;
+		lastDep = currDep;
 		lastSum = currSum;
 	}
-	printf("%d\n", cnt);
+	printf("%d\n%d\n", cnt1, cnt2);
 }
 
 
 int main() {
-	part1();
-	part2();
+	solve();
 }

@@ -3,7 +3,6 @@
 #include <string.h>
 #include <assert.h>
 
-#define FILENAME "input/11.txt"
 #define N 10
 #define ITERS 100
 
@@ -12,8 +11,6 @@ typedef struct {
 } pair;
 
 void solve() {
-    freopen(FILENAME, "r", stdin);
-
     char energy[N][N+1];
     for (int i = 0; i < N; ++i) {
         scanf("%s", energy[i]);

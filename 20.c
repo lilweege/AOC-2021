@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-
-#define FILENAME "input/20.txt"
+#include <stdbool.h>
 
 #define MAXIT 51
 #define N 100
@@ -13,7 +12,6 @@ char grids[2][MAXN][MAXN];
 char algo[512];
 
 void readInput() {
-    freopen(FILENAME, "r", stdin);
     scanf("%s", algo);
     for (int i = 0; i < N; ++i)
         assert(scanf("%s", grid[i]) != EOF);
@@ -30,7 +28,7 @@ void solve(int iters) {
         memcpy(&grids[0][i+MAXIT][MAXIT], grid[i], N);
     
     for (int it = 0; it < iters; ++it) {
-        char allOn = it & 1;
+        bool allOn = it & 1;
         for (int i = MAXIT-it-1; i < MAXIT+it+N+1; ++i)
             for (int j = MAXIT-it-1; j < MAXIT+it+N+1; ++j) {
                 int idx = 0;

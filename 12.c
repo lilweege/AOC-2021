@@ -3,8 +3,6 @@
 #include <assert.h>
 #include <string.h>
 
-#define FILENAME "input/12.txt"
-
 // this is probably the most tedious problem to solve in c
 // adjacency list of strings 😻
 #define MAX_LINES 32
@@ -25,13 +23,13 @@ void pb(list* l, int s) {
 // http://www.cse.yorku.ca/~oz/hash.html
 int hash(char* s) {
     int val = 5381;
-    for (char c; c = *s++;)
+    for (char c; (c = *s++);)
         val = ((val << 5) + val) + c; /* val * 33 + c */
     return val % TABLE_SIZE;
 }
 
 bool isLower(char* s) {
-    for (char c; c = *s++;)
+    for (char c; (c = *s++);)
         if (!('a' <= c && c <= 'z'))
             return false;
     return true;
@@ -46,7 +44,6 @@ list adj[TABLE_SIZE];
 int start = -1, end = -1;
 
 void readInput() {
-    freopen(FILENAME, "r", stdin);
     char a[MAX_STRLEN], b[MAX_STRLEN];
     memset(adj, 0, TABLE_SIZE*sizeof(list));
     memset(strs, 0, TABLE_SIZE*MAX_STRLEN);
