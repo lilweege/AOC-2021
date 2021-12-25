@@ -51,6 +51,12 @@ typedef struct {
     int size;
 } hashset;
 
+void hashsetClear(hashset* set) {
+    for (int i = 0; i < TABLE_SIZE; ++i)
+        set->data[i].size = 0;
+    set->size = 0;
+}
+
 int pointHash(point p) {
     int val = 5381;
     val = ((val << 5) + val) + p.x;
@@ -89,9 +95,8 @@ typedef struct {
 
 void solve() {
     freopen(FILENAME, "r", stdin);
-    hashset mySet;
-    memset(mySet.data, 0, TABLE_SIZE*sizeof(list));
-    mySet.size = 0;
+    hashset hs;
+    hashsetClear(&hs);
 
     fold folds[128];
     int numFolds = 0;
@@ -103,7 +108,7 @@ void solve() {
         }
         point p;
         sscanf(line, "%d,%d", &p.x, &p.y);
-        hashsetInsert(&mySet, p);
+        hashsetInsert(&hs, p);
     }
     do {
         char axis; int pos;
@@ -115,10 +120,10 @@ void solve() {
     for (int i = 0; i < numFolds; ++i) {
         fold f = folds[i];
 
-        hashset nxt = mySet;
+        hashset nxt = hs;
         for (int j = 0; j < TABLE_SIZE; ++j) {
-            for (int k = 0; k < mySet.data[j].size; ++k) {
-                point p = mySet.data[j].data[k];
+            for (int k = 0; k < hs.data[j].size; ++k) {
+                point p = hs.data[j].data[k];
                 if (f.axis && p.x > f.pos) {
                     hashsetInsert(&nxt, (point){f.pos - (p.x - f.pos), p.y});
                     hashsetRemove(&nxt, p);
@@ -129,22 +134,22 @@ void solve() {
                 }
             }
         }
-        mySet = nxt;
+        hs = nxt;
 
         if (i == 0)
-            printf("%d\n", mySet.size);
+            printf("%d\n", hs.size);
     }
 
     int mx = 0, my = 0;
     for (int j = 0; j < TABLE_SIZE; ++j)
-        for (int k = 0; k < mySet.data[j].size; ++k) {
-            point p = mySet.data[j].data[k];
+        for (int k = 0; k < hs.data[j].size; ++k) {
+            point p = hs.data[j].data[k];
             if (p.x > mx) mx = p.x;
             if (p.y > my) my = p.y;
         }
     for (int i = 0; i <= my; ++i) {
         for (int j = 0; j <= mx; ++j)
-            putchar(hashsetContains(&mySet, (point){j, i}) ? '#' : '.');
+            putchar(hashsetContains(&hs, (point){j, i}) ? '#' : '.');
         putchar('\n');
     }
 }

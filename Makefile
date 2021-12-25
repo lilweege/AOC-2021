@@ -15,7 +15,7 @@ $(BIN)/%.out: %.cpp
 
 run: $(BINS)
 	@rm -f $(LOGFILE)
-	@bash -c "TIMEFORMAT='%U'; \
+	@bash -c "TIMEFORMAT='%E'; \
 		duration=0; \
 		for f in \$$(ls $(BIN)); do \
 			elapsed=\$$(time (./$(BIN)/\$$f >> $(LOGFILE);) 2>&1); \
