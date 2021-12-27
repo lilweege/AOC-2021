@@ -8,18 +8,33 @@
 #define max(x, y) ((x) > (y) ? (x) : (y))
 int N;
 
-// welcome to heap hell
+#define MEM_CAP (1<<28)
+char mem[MEM_CAP];
+size_t memSize = 0;
+void* badMalloc(size_t numBytes) {
+    assert(memSize + numBytes < MEM_CAP);
+    void* start = mem + memSize;
+    memSize += numBytes;
+    return start;
+}
+
+void memClear() {
+    memset(mem, 0, sizeof(MEM_CAP));
+    memSize = 0;
+}
+
 typedef struct {
     int cost;
     char* map;
 } state;
 
 state stateNew() {
-    return (state) { 0, (char*) malloc(11+4*N) };
+    return (state) { 0, (char*) badMalloc(11+4*N) };
 }
 
 void stateFree(state s) {
-    free(s.map);
+    (void) s;
+    // free(s.map);
 }
 
 // for heap
@@ -54,18 +69,19 @@ typedef struct {
 } list;
 
 list listNew(int cap) {
-    return (list) { (state*) malloc(cap*sizeof(state)), cap, 0 };
+    return (list) { (state*) badMalloc(cap*sizeof(state)), cap, 0 };
 }
 
 void listFree(list l) {
-    for (int i = 0; i < l.size; ++i)
-        stateFree(l.data[i]);
-    free(l.data);
+    (void) l;
+    // for (int i = 0; i < l.size; ++i)
+    //     stateFree(l.data[i]);
+    // free(l.data);
 }
 
 void listClear(list* l) {
-    for (int i = 0; i < l->size; ++i)
-        stateFree(l->data[i]);
+    // for (int i = 0; i < l->size; ++i)
+    //     stateFree(l->data[i]);
     l->size = 0;
 }
 
@@ -143,7 +159,7 @@ typedef struct {
 
 hashset hashsetNew(int setCap, int lstCap) {
     hashset set;
-    set.data = (list*) malloc(setCap*sizeof(list));
+    set.data = (list*) badMalloc(setCap*sizeof(list));
     for (int i = 0; i < setCap; ++i)
         set.data[i] = listNew(lstCap);
     set.size = 0;
@@ -152,9 +168,10 @@ hashset hashsetNew(int setCap, int lstCap) {
 }
 
 void hashsetFree(hashset set) {
-    for (int i = 0; i < set.cap; ++i)
-        listFree(set.data[i]);
-    free(set.data);
+    (void) set;
+    // for (int i = 0; i < set.cap; ++i)
+    //     listFree(set.data[i]);
+    // free(set.data);
 }
 
 void hashsetClear(hashset* set) {
@@ -240,7 +257,8 @@ void addNewMoves(state s) {
                         newS.cost = s.cost + dist*pows[guy-'A'];
                         int hv, id;
                         if (!hashsetFind(&minCost, newS, &hv, &id)) {
-                            hashsetInsert(&minCost, stateCpy(newS));
+                            // hashsetInsert(&minCost, stateCpy(newS));
+                            hashsetInsert(&minCost, newS);
                             heapPush(&pq, newS);
                         }
                         else if (newS.cost < hashsetGet(&minCost, hv, id)) {
@@ -281,7 +299,8 @@ void addNewMoves(state s) {
                     newS.cost = s.cost + dist*pows[guy-'A'];
                     int hv, id;
                     if (!hashsetFind(&minCost, newS, &hv, &id)) {
-                        hashsetInsert(&minCost, stateCpy(newS));
+                        // hashsetInsert(&minCost, stateCpy(newS));
+                        hashsetInsert(&minCost, newS);
                         heapPush(&pq, newS);
                     }
                     else if (newS.cost < hashsetGet(&minCost, hv, id)) {
@@ -298,14 +317,19 @@ void addNewMoves(state s) {
 }
 
 void solve(const char* start) {
-    listClear(&pq);
-    hashsetClear(&minCost);
+    // listClear(&pq);
+    // hashsetClear(&minCost);
+    memClear();
+    pq = listNew(1<<15);
+    minCost = hashsetNew(1<<17, 64);
+
     N = (strlen(start) - 11) / 4;
     
     state initState = stateNew();
     memcpy(initState.map, start, 11+4*N);
     heapPush(&pq, initState);
-    hashsetInsert(&minCost, stateCpy(initState));
+    // hashsetInsert(&minCost, stateCpy(initState));
+    hashsetInsert(&minCost, initState);
 
     int ans = -1;
     while (pq.size > 0) {
@@ -330,7 +354,7 @@ void solve(const char* start) {
         }
         
         addNewMoves(s);
-        stateFree(s);
+        // stateFree(s);
     }
     printf("%d\n", ans);
 }
@@ -361,16 +385,28 @@ void readInput() { // lol
 //   - some other smart stuff probably
 // - don't store unused hallway positions (can save 4 bytes per state)
 // - improve hash function
-// - probably don't malloc or free / fix leaks
+// x probably don't malloc or free / fix leaks
 // - improve hashmap api
 // - clean up
 
+void test() {
+    solve("...........BACDBCDA"); // sample - 12521/44169
+    solve("...........DBACCBDA"); // excel guy - 14148/43814
+    solve("...........ADCABDCB"); // xdavidliu - 16300/48676
+    solve("...........DDCCABBA"); // me - 19160/47232
+    solve("...........BDDACCBDBBACDACA"); // sample - 12521/44169
+    solve("...........ADDDCCBABBADCACB"); // xdavidliu - 16300/48676
+    solve("...........DDDBACBCCBABDACA"); // excel guy - 14148/43814
+    solve("...........DDDDCCBCABABBACA"); // me - 19160/47232
+}
+
 int main() {
-    pq = listNew(1<<15);
-    minCost = hashsetNew(1<<17, 64); // this is slow as balls
+    // pq = listNew(1<<15);
+    // minCost = hashsetNew(1<<17, 64); // this is slow as balls
+    // test();
     readInput();
     solve(part1start);
     solve(part2start);
-    listFree(pq);
-    hashsetFree(minCost);
+    // listFree(pq);
+    // hashsetFree(minCost);
 }
