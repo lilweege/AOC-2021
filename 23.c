@@ -8,7 +8,7 @@
 #define max(x, y) ((x) > (y) ? (x) : (y))
 int N;
 
-#define MEM_CAP (1<<28)
+#define MEM_CAP (1<<29)
 char mem[MEM_CAP];
 size_t memSize = 0;
 void* badMalloc(size_t numBytes) {
@@ -19,7 +19,6 @@ void* badMalloc(size_t numBytes) {
 }
 
 void memClear() {
-    memset(mem, 0, sizeof(MEM_CAP));
     memSize = 0;
 }
 
@@ -28,8 +27,26 @@ typedef struct {
     char* map;
 } state;
 
+/*
+01 2 3 4 56
+  7 9 b d
+  8 a c e
+*/
+
+int idxToPos(int i) {
+    if (i == 0) return 0;
+    if (i == 6) return 10;
+    return i*2-1;
+}
+
+int posToIdx(int p) {
+    if (p == 0) return 0;
+    if (p == 10) return 6;
+    return (p+1)/2;
+}
+
 state stateNew() {
-    return (state) { 0, (char*) badMalloc(11+4*N) };
+    return (state) { 0, (char*) badMalloc(7+4*N) };
 }
 
 void stateFree(state s) {
@@ -44,12 +61,12 @@ int stateCmpCost(state a, state b) {
 
 // for hashmap
 int stateCmpMap(state a, state b) {
-    return memcmp(a.map, b.map, 11+4*N);
+    return memcmp(a.map, b.map, 7+4*N);
 }
 
 size_t stateHash(state s) {
     size_t val = 31;
-    for (int i = 0; i < 11+4*N; ++i)
+    for (int i = 0; i < 7+4*N; ++i)
         val = ((val << 5) + val) + s.map[i]; /* val * 33 + c */
     return val;
 }
@@ -58,7 +75,7 @@ size_t stateHash(state s) {
 state stateCpy(state s) {
     state n = stateNew();
     n.cost = s.cost;
-    memcpy(n.map, s.map, 11+4*N);
+    memcpy(n.map, s.map, 7+4*N);
     return n;
 }
 
@@ -222,23 +239,21 @@ int hashsetGetOrDefault(hashset* set, state x, int d) {
 }
 
 
-int hallways[7] = {0, 1, 3, 5, 7, 9, 10};
-int numHallways = 7;
 int pows[4] = { 1, 10, 100, 1000 };
 list pq;
 hashset minCost;
 
 void addNewMoves(state s) {
-    for (int hallwayIdx = 0; hallwayIdx < numHallways; ++hallwayIdx) {
-        int hallway = hallways[hallwayIdx];
+    for (int hallway = 0; hallway < 7; ++hallway) {
         if (s.map[hallway] == '.') {
             // try to move all guys to this position
             for (int room = 0; room < 4; ++room) {
+                int pos = idxToPos(hallway);
                 int under = room * 2 + 2;
-                int mi = min(hallway, under);
-                int ma = max(hallway, under);
+                int l = min(pos, under+(under<pos?1:-1));
+                int r = max(pos, under+(under<pos?1:-1));
                 bool ok = true;
-                for (int i=mi; i <= ma; ++i) {
+                for (int i = posToIdx(l); i <= posToIdx(r); ++i) {
                     if (s.map[i] != '.') {
                         ok = false;
                         break;
@@ -247,9 +262,9 @@ void addNewMoves(state s) {
                 if (!ok) continue;
                 for (int dep = 0; dep < N; ++dep) {
                     // take only the top guy
-                    int cellIdx = 11 + (room*N+dep);
+                    int cellIdx = 7 + (room*N+dep);
                     if (s.map[cellIdx] != '.') {
-                        int dist = abs(hallway - under) + dep+1;
+                        int dist = abs(pos - under) + dep+1;
                         state newS = stateCpy(s);
                         char guy = newS.map[cellIdx];
                         newS.map[cellIdx] = '.';
@@ -274,10 +289,11 @@ void addNewMoves(state s) {
             // try to move this guy to his room
             int room = s.map[hallway]-'A';
             int under = room * 2 + 2;
-            int mi = min(hallway, under);
-            int ma = max(hallway, under);
+            int pos = idxToPos(hallway);
+            int l = min(pos, under+(under<pos?1:-1));
+            int r = max(pos, under+(under<pos?1:-1));
             bool ok = true;
-            for (int i=mi; i <= ma; ++i) {
+            for (int i = posToIdx(l); i <= posToIdx(r); ++i) {
                 if (i == hallway) continue;
                 if (s.map[i] != '.') {
                     ok = false;
@@ -289,9 +305,9 @@ void addNewMoves(state s) {
             }
             for (int dep = N-1; dep >= 0; --dep) {
                 // take only lowest empty cell
-                int cellIdx = 11 + (room*N+dep);
+                int cellIdx = 7 + (room*N+dep);
                 if (s.map[cellIdx] == '.') {
-                    int dist = abs(hallway - under) + dep+1;
+                    int dist = abs(pos - under) + dep+1;
                     state newS = stateCpy(s);
                     char guy = newS.map[hallway];
                     newS.map[hallway] = '.';
@@ -321,12 +337,12 @@ void solve(const char* start) {
     // hashsetClear(&minCost);
     memClear();
     pq = listNew(1<<15);
-    minCost = hashsetNew(1<<17, 64);
+    minCost = hashsetNew(1<<17, 128);
 
-    N = (strlen(start) - 11) / 4;
+    N = (strlen(start) - 7) / 4;
     
     state initState = stateNew();
-    memcpy(initState.map, start, 11+4*N);
+    memcpy(initState.map, start, 7+4*N);
     heapPush(&pq, initState);
     // hashsetInsert(&minCost, stateCpy(initState));
     hashsetInsert(&minCost, initState);
@@ -334,14 +350,15 @@ void solve(const char* start) {
     int ans = -1;
     while (pq.size > 0) {
         state s = heapPop(&pq);
-        // printf("%d '%19s'\n", s.cost, s.map);
         if (s.cost > hashsetGetOrDefault(&minCost, s, 1<<30)) {
             continue;
         }
+        // printf("%d '%.19s'\n", s.cost, s.map);
         bool done = true;
-        for (int i = 0; i < 4; ++i) {
-            for (int j = 0; j < N; ++j) {
-                if (s.map[11+i*N+j] != 'A'+i) {
+        for (int room = 0; room < 4; ++room) {
+            for (int dep = 0; dep < N; ++dep) {
+                int cellIdx = 7+room*N+dep;
+                if (s.map[cellIdx] != 'A'+room) {
                     done = false;
                     break;
                 }
@@ -359,23 +376,23 @@ void solve(const char* start) {
     printf("%d\n", ans);
 }
 
-char part1start[11+4*2+1];
-char part2start[11+4*4+1];
+char part1start[7+4*2+1];
+char part2start[7+4*4+1];
 void readInput() { // lol
     scanf("#############\n#...........#\n###%c#%c#%c#%c###\n  #%c#%c#%c#%c",
-            &part1start[11], &part1start[13], &part1start[15], &part1start[17],
-            &part1start[12], &part1start[14], &part1start[16], &part1start[18]);
+            &part1start[7], &part1start[ 9], &part1start[11], &part1start[13],
+            &part1start[8], &part1start[10], &part1start[12], &part1start[14]);
     for (int i = 0; i < 4; ++i) {
-        part2start[11+i*4] = part1start[11+i*2]; // 11 13 15 17
-        part2start[14+i*4] = part1start[12+i*2]; // 14 18 22 26
+        part2start[ 7+i*4] = part1start[7+i*2]; //  7 11 15 19
+        part2start[10+i*4] = part1start[8+i*2]; // 10 14 18 22
     }
     sscanf("  #D#C#B#A#\n  #D#B#A#C#", "  #%c#%c#%c#%c#\n  #%c#%c#%c#%c#",
-            &part2start[12], &part2start[16], &part2start[20], &part2start[24],
-            &part2start[13], &part2start[17], &part2start[21], &part2start[25]);
-    memset(part1start, '.', 11);
-    memset(part2start, '.', 11);
-    part1start[11+4*2] = 0;
-    part2start[11+4*4] = 0;
+            &part2start[8], &part2start[12], &part2start[16], &part2start[20],
+            &part2start[9], &part2start[13], &part2start[17], &part2start[21]);
+    memset(part1start, '.', 7);
+    memset(part2start, '.', 7);
+    part1start[7+4*2] = 0;
+    part2start[7+4*4] = 0;
 }
 
 // TODO: fix this terrible program
@@ -383,21 +400,21 @@ void readInput() { // lol
 // - remove unnecessary branches
 //   - if straight path from cell to final room, don't bother with hallway
 //   - some other smart stuff probably
-// - don't store unused hallway positions (can save 4 bytes per state)
+// x don't store unused hallway positions (can save 4 bytes per state)
 // - improve hash function
 // x probably don't malloc or free / fix leaks
 // - improve hashmap api
 // - clean up
 
 void test() {
-    solve("...........BACDBCDA"); // sample - 12521/44169
-    solve("...........DBACCBDA"); // excel guy - 14148/43814
-    solve("...........ADCABDCB"); // xdavidliu - 16300/48676
-    solve("...........DDCCABBA"); // me - 19160/47232
-    solve("...........BDDACCBDBBACDACA"); // sample - 12521/44169
-    solve("...........ADDDCCBABBADCACB"); // xdavidliu - 16300/48676
-    solve("...........DDDBACBCCBABDACA"); // excel guy - 14148/43814
-    solve("...........DDDDCCBCABABBACA"); // me - 19160/47232
+    solve(".......BACDBCDA"); // sample - 12521/44169
+    solve(".......DBACCBDA"); // excel guy - 14148/43814
+    solve(".......ADCABDCB"); // xdavidliu - 16300/48676
+    solve(".......DDCCABBA"); // me - 19160/47232
+    solve(".......BDDACCBDBBACDACA"); // sample - 12521/44169
+    solve(".......ADDDCCBABBADCACB"); // xdavidliu - 16300/48676
+    solve(".......DDDBACBCCBABDACA"); // excel guy - 14148/43814
+    solve(".......DDDDCCBCABABBACA"); // me - 19160/47232
 }
 
 int main() {
