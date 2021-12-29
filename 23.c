@@ -3,12 +3,13 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #define min(x, y) ((x) < (y) ? (x) : (y))
 #define max(x, y) ((x) > (y) ? (x) : (y))
 int N;
 
-#define MEM_CAP (1<<29)
+#define MEM_CAP (1<<26)
 char mem[MEM_CAP];
 size_t memSize = 0;
 void* badMalloc(size_t numBytes) {
@@ -64,11 +65,17 @@ int stateCmpMap(state a, state b) {
     return memcmp(a.map, b.map, 7+4*N);
 }
 
-size_t stateHash(state s) {
-    size_t val = 31;
-    for (int i = 0; i < 7+4*N; ++i)
-        val = ((val << 5) + val) + s.map[i]; /* val * 33 + c */
-    return val;
+#define FNV1_32_INIT ((uint32_t)0x811c9dc5)
+#define FNV_32_PRIME ((uint32_t)0x01000193)
+uint32_t stateHash(state s) {
+    // for (int i = 0; i < 7+4*N; ++i)
+    //     hash = ((hash << 5) + hash) + s.map[i];
+    uint32_t hash = FNV1_32_INIT;
+    for (int i = 0; i < 7+4*N; ++i) {
+	    hash ^= s.map[i];
+	    hash *= FNV_32_PRIME;
+    }
+    return hash;
 }
 
 
@@ -197,13 +204,16 @@ void hashsetClear(hashset* set) {
     set->size = 0;
 }
 
-bool hashsetInsert(hashset* set, state x) {
-    int hv = stateHash(x) % set->cap;
+bool hashsetInsertHint(hashset* set, state x, int hv) {
     if (listIndex(&set->data[hv], x) != -1)
         return false;
     listPush(&set->data[hv], x);
     ++set->size;
     return true;
+}
+
+bool hashsetInsert(hashset* set, state x) {
+    return hashsetInsertHint(set, x, stateHash(x) % set->cap);
 }
 
 bool hashsetFind(hashset* set, state x, int* i, int* j) {
@@ -243,6 +253,33 @@ int pows[4] = { 1, 10, 100, 1000 };
 list pq;
 hashset minCost;
 
+void tryAddMove(state s, int fr, int to, int dist) {
+    state newS = stateCpy(s);
+    char guy = newS.map[fr];
+    newS.map[fr] = '.';
+    newS.map[to] = guy;
+    newS.cost = s.cost + dist*pows[guy-'A'];
+    int hv, id;
+    if (!hashsetFind(&minCost, newS, &hv, &id)) {
+        // hashsetInsert(&minCost, stateCpy(newS));
+        hashsetInsertHint(&minCost, newS, hv);
+        heapPush(&pq, newS);
+    }
+    else if (newS.cost < hashsetGet(&minCost, hv, id)) {
+        hashsetUpdate(&minCost, hv, id, newS.cost);
+        heapPush(&pq, newS);
+    }
+}
+
+unsigned char blocked(state s, int pos, int under) {
+    int l = posToIdx(min(pos, under+(under<pos?1:-1)));
+    int r = posToIdx(max(pos, under+(under<pos?1:-1)));
+    unsigned char taken = 0;
+    for (int i = l; i <= r; ++i)
+        taken |= (s.map[i] != '.') * (1<<i);
+    return taken;
+}
+
 void addNewMoves(state s) {
     for (int hallway = 0; hallway < 7; ++hallway) {
         if (s.map[hallway] == '.') {
@@ -250,36 +287,14 @@ void addNewMoves(state s) {
             for (int room = 0; room < 4; ++room) {
                 int pos = idxToPos(hallway);
                 int under = room * 2 + 2;
-                int l = min(pos, under+(under<pos?1:-1));
-                int r = max(pos, under+(under<pos?1:-1));
-                bool ok = true;
-                for (int i = posToIdx(l); i <= posToIdx(r); ++i) {
-                    if (s.map[i] != '.') {
-                        ok = false;
-                        break;
-                    }
-                }
-                if (!ok) continue;
+                if (blocked(s, pos, under))
+                    continue;
                 for (int dep = 0; dep < N; ++dep) {
                     // take only the top guy
                     int cellIdx = 7 + (room*N+dep);
                     if (s.map[cellIdx] != '.') {
                         int dist = abs(pos - under) + dep+1;
-                        state newS = stateCpy(s);
-                        char guy = newS.map[cellIdx];
-                        newS.map[cellIdx] = '.';
-                        newS.map[hallway] = guy;
-                        newS.cost = s.cost + dist*pows[guy-'A'];
-                        int hv, id;
-                        if (!hashsetFind(&minCost, newS, &hv, &id)) {
-                            // hashsetInsert(&minCost, stateCpy(newS));
-                            hashsetInsert(&minCost, newS);
-                            heapPush(&pq, newS);
-                        }
-                        else if (newS.cost < hashsetGet(&minCost, hv, id)) {
-                            hashsetUpdate(&minCost, hv, id, newS.cost);
-                            heapPush(&pq, newS);
-                        }
+                        tryAddMove(s, cellIdx, hallway, dist);
                         break;
                     }
                 }
@@ -290,42 +305,18 @@ void addNewMoves(state s) {
             int room = s.map[hallway]-'A';
             int under = room * 2 + 2;
             int pos = idxToPos(hallway);
-            int l = min(pos, under+(under<pos?1:-1));
-            int r = max(pos, under+(under<pos?1:-1));
-            bool ok = true;
-            for (int i = posToIdx(l); i <= posToIdx(r); ++i) {
-                if (i == hallway) continue;
-                if (s.map[i] != '.') {
-                    ok = false;
-                    break;
-                }
-            }
-            if (!ok) {
+            if (blocked(s, pos, under) & ~(1 << hallway))
                 continue;
-            }
             for (int dep = N-1; dep >= 0; --dep) {
                 // take only lowest empty cell
                 int cellIdx = 7 + (room*N+dep);
                 if (s.map[cellIdx] == '.') {
                     int dist = abs(pos - under) + dep+1;
-                    state newS = stateCpy(s);
-                    char guy = newS.map[hallway];
-                    newS.map[hallway] = '.';
-                    newS.map[cellIdx] = guy;
-                    newS.cost = s.cost + dist*pows[guy-'A'];
-                    int hv, id;
-                    if (!hashsetFind(&minCost, newS, &hv, &id)) {
-                        // hashsetInsert(&minCost, stateCpy(newS));
-                        hashsetInsert(&minCost, newS);
-                        heapPush(&pq, newS);
-                    }
-                    else if (newS.cost < hashsetGet(&minCost, hv, id)) {
-                        hashsetUpdate(&minCost, hv, id, newS.cost);
-                        heapPush(&pq, newS);
-                    }
+                    tryAddMove(s, hallway, cellIdx, dist);
                     break;
                 }
-                if (s.map[cellIdx] != s.map[hallway]) break;
+                if (s.map[cellIdx] != s.map[hallway])
+                    break;
             }
         }
 
@@ -337,14 +328,13 @@ void solve(const char* start) {
     // hashsetClear(&minCost);
     memClear();
     pq = listNew(1<<15);
-    minCost = hashsetNew(1<<17, 128);
+    minCost = hashsetNew((1<<18)+3, 8);
 
     N = (strlen(start) - 7) / 4;
     
     state initState = stateNew();
     memcpy(initState.map, start, 7+4*N);
     heapPush(&pq, initState);
-    // hashsetInsert(&minCost, stateCpy(initState));
     hashsetInsert(&minCost, initState);
 
     int ans = -1;
@@ -401,26 +391,13 @@ void readInput() { // lol
 //   - if straight path from cell to final room, don't bother with hallway
 //   - some other smart stuff probably
 // x don't store unused hallway positions (can save 4 bytes per state)
-// - improve hash function
+// x improve hash function
 // x probably don't malloc or free / fix leaks
-// - improve hashmap api
 // - clean up
-
-void test() {
-    solve(".......BACDBCDA"); // sample - 12521/44169
-    solve(".......DBACCBDA"); // excel guy - 14148/43814
-    solve(".......ADCABDCB"); // xdavidliu - 16300/48676
-    solve(".......DDCCABBA"); // me - 19160/47232
-    solve(".......BDDACCBDBBACDACA"); // sample - 12521/44169
-    solve(".......ADDDCCBABBADCACB"); // xdavidliu - 16300/48676
-    solve(".......DDDBACBCCBABDACA"); // excel guy - 14148/43814
-    solve(".......DDDDCCBCABABBACA"); // me - 19160/47232
-}
 
 int main() {
     // pq = listNew(1<<15);
     // minCost = hashsetNew(1<<17, 64); // this is slow as balls
-    // test();
     readInput();
     solve(part1start);
     solve(part2start);
