@@ -337,6 +337,9 @@ void solve(const char* start) {
     heapPush(&pq, initState);
     hashsetInsert(&minCost, initState);
 
+    // this dijkstra is good enough for now (~0.2s on my machine)
+    // it's probably possible to be way faster if some heuristic
+    // function is used to reweight the heap, but idc rn
     int ans = -1;
     while (pq.size > 0) {
         state s = heapPop(&pq);
@@ -385,19 +388,9 @@ void readInput() { // lol
     part2start[7+4*4] = 0;
 }
 
-// TODO: fix this terrible program
-// - add some kind of heuristic function
-// - remove unnecessary branches
-//   - if straight path from cell to final room, don't bother with hallway
-//   - some other smart stuff probably
-// x don't store unused hallway positions (can save 4 bytes per state)
-// x improve hash function
-// x probably don't malloc or free / fix leaks
-// - clean up
-
 int main() {
     // pq = listNew(1<<15);
-    // minCost = hashsetNew(1<<17, 64); // this is slow as balls
+    // minCost = hashsetNew(1<<17, 64);
     readInput();
     solve(part1start);
     solve(part2start);
