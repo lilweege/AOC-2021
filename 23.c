@@ -159,7 +159,7 @@ void listPush(list* l, state x) {
 bool listErase(list* l, state x) {
     for (int i = 0; i < l->size; ++i)
         if (stateCmpMap(x, l->data[i]) == 0) {
-            memcpy(&l->data[i], &l->data[i+1],
+            memmove(&l->data[i], &l->data[i+1],
                     (l->size-i-1)*sizeof(state));
             --l->size;
             return true;

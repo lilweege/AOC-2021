@@ -45,7 +45,7 @@ void listPush(list* l, point x) {
 bool listErase(list* l, point x) {
     for (int i = 0; i < l->size; ++i)
         if (pointCmp(x, l->data[i]) == 0) {
-            memcpy(&l->data[i], &l->data[i+1],
+            memmove(&l->data[i], &l->data[i+1],
                     (l->size-i-1)*sizeof(point));
             --l->size;
             return true;
