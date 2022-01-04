@@ -70,7 +70,7 @@ ull parsePacket(int* idx) {
             }
         }
 
-        ull val;
+        ull val = 0;
         if (T == 0) {
             val = 0;
             for (int i = 0; i < packets.size; ++i)

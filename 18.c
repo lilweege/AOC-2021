@@ -56,6 +56,7 @@ node* fromStr(char** s) {
         return newLeaf(c - '0');
     }
     assert(0 && "Unreachable");
+    return NULL;
 }
 
 
