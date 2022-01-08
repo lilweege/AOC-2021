@@ -66,6 +66,11 @@ typedef struct {
     int cap;
 } hashset;
 
+int hashval(hashset* set, point x) {
+    // return pointHash(x) % set->cap; // slow
+    return pointHash(x) & (set->cap-1); // fast (set cap must be power of 2)
+}
+
 void hashsetInit(hashset* set, int cap, int lstCap) {
     set->data = (list*) malloc(cap*sizeof(list));
     for (int i = 0; i < cap; ++i)
@@ -87,7 +92,7 @@ void hashsetClear(hashset* set) {
 }
 
 bool hashsetInsert(hashset* set, point x) {
-    int hv = pointHash(x) % set->cap;
+    int hv = hashval(set, x);
     if (listIndex(&set->data[hv], x) != -1)
         return false;
     listPush(&set->data[hv], x);
@@ -96,12 +101,12 @@ bool hashsetInsert(hashset* set, point x) {
 }
 
 bool hashsetContains(hashset* set, point x) {
-    int hv = pointHash(x) % set->cap;
+    int hv = hashval(set, x);
     return listIndex(&set->data[hv], x) != -1;
 }
 
 bool hashsetRemove(hashset* set, point x) {
-    int hv = pointHash(x) % set->cap;
+    int hv = hashval(set, x);
     if (listErase(&set->data[hv], x)) {
         --set->size;
         return true;
@@ -141,7 +146,7 @@ void counterClear(counter* map) {
 }
 
 int counterIncrement(counter* map, point x) {
-    int hv = pointHash(x) % map->set.cap;
+    int hv = hashval(&map->set, x);
     int idx = listIndex(&map->set.data[hv], x);
     if (idx == -1) {
         idx = map->set.data[hv].size;
@@ -151,7 +156,8 @@ int counterIncrement(counter* map, point x) {
 }
 
 int counterGet(counter* map, point x) {
-    int hv = pointHash(x) % map->set.cap;
+        int hv = hashval(&map->set, x);
+
     int idx = listIndex(&map->set.data[hv], x);
     return idx == -1 ? 0 : map->cnt[hv][idx];
 }

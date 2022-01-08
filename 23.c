@@ -9,7 +9,7 @@
 #define max(x, y) ((x) > (y) ? (x) : (y))
 int N;
 
-#define MEM_CAP (1<<26)
+#define MEM_CAP (1<<27)
 char mem[MEM_CAP];
 size_t memSize = 0;
 void* badMalloc(size_t numBytes) {
@@ -181,6 +181,11 @@ typedef struct {
 } hashset;
 // in this case it's more of a hashmap really
 
+int hashval(hashset* set, state x) {
+    // return stateHash(x) % set->cap; // slow
+    return stateHash(x) & (set->cap - 1); // fast (set cap must be power of 2)
+}
+
 hashset hashsetNew(int setCap, int lstCap) {
     hashset set;
     set.data = (list*) badMalloc(setCap*sizeof(list));
@@ -213,11 +218,11 @@ bool hashsetInsertHint(hashset* set, state x, int hv) {
 }
 
 bool hashsetInsert(hashset* set, state x) {
-    return hashsetInsertHint(set, x, stateHash(x) % set->cap);
+    return hashsetInsertHint(set, x, hashval(set, x));
 }
 
 bool hashsetFind(hashset* set, state x, int* i, int* j) {
-    int hv = stateHash(x) % set->cap;
+    int hv = hashval(set, x);
     int id = listIndex(&set->data[hv], x);
     if (i) *i = hv;
     if (j) *j = id;
@@ -233,7 +238,7 @@ int hashsetGet(hashset* set, int hv, int id) {
 }
 
 bool hashsetRemove(hashset* set, state x) {
-    int hv = stateHash(x) % set->cap;
+    int hv = hashval(set, x);
     if (listErase(&set->data[hv], x)) {
         --set->size;
         return true;
@@ -328,7 +333,7 @@ void solve(const char* start) {
     // hashsetClear(&minCost);
     memClear();
     pq = listNew(1<<15);
-    minCost = hashsetNew((1<<18)+3, 8);
+    minCost = hashsetNew(1<<18, 16);
 
     N = (strlen(start) - 7) / 4;
     
