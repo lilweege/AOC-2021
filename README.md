@@ -9,7 +9,7 @@ Of course runtimes vary depending on hardware, so to specify, I aimed for a cumu
 ## My Results
 Here is one sample of my incredibly unscientific tests. The slowest days were 15, 19, and 23. Given enough time I might be able to come up with something faster, but I am satisfied with my current solutions.
 
-| Day | Runtime (ms) |
+| Day | Runtime (s) |
 |-------|-------|
 |     1 | 0.006 |
 |     2 | 0.006 |
